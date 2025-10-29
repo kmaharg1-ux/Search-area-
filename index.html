@@ -8,27 +8,32 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="controls">
-    <label>Distance:
-      <input type="number" id="distance" value="2640" />
-    </label><br/>
-    <label>Units:
-      <select id="units">
-        <option value="feet">Feet</option>
-        <option value="chains">Chains</option>
-        <option value="miles">Miles</option>
-      </select>
-    </label><br/>
-    <label>Declination (°):
-      <input type="number" id="declination" value="2.5" />
-    </label><br/>
-    <label>Travel Direction:
-      <select id="direction">
-        <option value="NS">North–South</option>
-        <option value="EW">East–West</option>
-      </select>
-    </label><br/>
-    <button onclick="calculateOffset()">Calculate Offset</button>
+  <div class="controls collapsed">
+    <button id="togglePanel" onclick="toggleControls()">☰ Show Controls</button>
+    <div id="controlPanel">
+      <label>Distance:
+        <input type="number" id="distance" value="2640" />
+      </label><br/>
+      <label>Units:
+        <select id="units">
+          <option value="feet">Feet</option>
+          <option value="chains">Chains</option>
+          <option value="miles">Miles</option>
+        </select>
+      </label><br/>
+      <label>Declination (°):
+        <input type="number" id="declination" value="2.5" />
+      </label><br/>
+      <label>Travel Direction:
+        <select id="direction">
+          <option value="NS">North–South</option>
+          <option value="EW">East–West</option>
+        </select>
+      </label><br/>
+      <button onclick="calculateOffset()">Calculate Offset</button>
+      <button onclick="startTracking()">Get My Location</button>
+      <p id="status">Status: Not tracking</p>
+    </div>
   </div>
 
   <div id="map"></div>
