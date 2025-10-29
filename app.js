@@ -8,21 +8,45 @@ L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 let userMarker, radiusCircle, offsetMarker;
+let watchId = null;
 
-navigator.geolocation.watchPosition(pos => {
-  const lat = pos.coords.latitude;
-  const lng = pos.coords.longitude;
+// Start GPS tracking when button is clicked
+function startTracking() {
+  document.getElementById("status").textContent = "Status: Waiting for GPS…";
 
-  if (!userMarker) {
-    userMarker = L.marker([lat, lng]).addTo(map).bindPopup("You are here").openPopup();
-    map.setView([lat, lng], 15);
-  } else {
-    userMarker.setLatLng([lat, lng]);
+  if (watchId !== null) {
+    navigator.geolocation.clearWatch(watchId);
   }
 
-  window.currentLocation = { lat, lng };
-});
+  watchId = navigator.geolocation.watchPosition(
+    pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
 
+      document.getElementById("status").textContent = `Status: Location locked at ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
+      if (!userMarker) {
+        userMarker = L.marker([lat, lng]).addTo(map).bindPopup("You are here").openPopup();
+        map.setView([lat, lng], 15);
+      } else {
+        userMarker.setLatLng([lat, lng]);
+      }
+
+      window.currentLocation = { lat, lng };
+    },
+    err => {
+      document.getElementById("status").textContent = "Status: Error getting location";
+      console.error(err);
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 1000,
+      timeout: 10000
+    }
+  );
+}
+
+// Calculate declination offset and draw radius + pin
 function calculateOffset() {
   if (!window.currentLocation) {
     alert("Waiting for GPS fix...");
@@ -45,20 +69,16 @@ function calculateOffset() {
   const lat = window.currentLocation.lat;
   const lng = window.currentLocation.lng;
 
-  // Calculate offset based on travel direction
   let offsetLat = lat;
   let offsetLng = lng;
 
   if (direction === "NS") {
-    // Offset is East/West
     const metersPerDegreeLng = 40075000 * Math.cos(lat * Math.PI / 180) / 360;
     offsetLng += offsetMeters / metersPerDegreeLng;
   } else if (direction === "EW") {
-    // Offset is North/South
     offsetLat += offsetMeters / 111320;
   }
 
-  // Draw search radius
   if (radiusCircle) map.removeLayer(radiusCircle);
   radiusCircle = L.circle([lat, lng], {
     radius: distanceFeet * 0.3048,
@@ -66,10 +86,22 @@ function calculateOffset() {
     fillOpacity: 0.1
   }).addTo(map);
 
-  // Place offset pin
   if (offsetMarker) map.removeLayer(offsetMarker);
   offsetMarker = L.marker([offsetLat, offsetLng])
     .addTo(map)
     .bindPopup("Offset due to declination")
     .openPopup();
+}
+
+// Toggle control panel visibility
+function toggleControls() {
+  const controls = document.querySelector('.controls');
+  controls.classList.toggle('collapsed');
+
+  const toggleBtn = document.getElementById('togglePanel');
+  if (controls.classList.contains('collapsed')) {
+    toggleBtn.textContent = "☰ Show Controls";
+  } else {
+    toggleBtn.textContent = "☰ Hide Controls";
+  }
 }
