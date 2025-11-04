@@ -1,4 +1,4 @@
-const map = L.map('map').setView([46.6, -112.0], 10);
+const map = L.map('map').setView([46.6, -112.0], 16);
 
 // 🗺️ USGS Topo Tiles
 L.tileLayer('https://basemap.nationalmap.gov/ArcGIS/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
@@ -14,7 +14,7 @@ L.tileLayer.wms('https://gisservicemt.gov/arcgis/services/MSDI_Framework/PLSS/Ma
   attribution: 'Montana State Library PLSS'
 }).addTo(map);
 
-// 📍 GPS Tracking with High Accuracy
+// 📍 GPS Tracking with High Accuracy — No Auto-Zoom
 let currentLat = null;
 let currentLng = null;
 let gpsMarker = null;
@@ -40,8 +40,7 @@ navigator.geolocation.watchPosition(
       }).addTo(map);
     }
 
-   // map.setView(latlng, 16);
-
+    // ❌ No auto-zoom or auto-centering
     document.getElementById('gps-output').innerText =
       `Lat: ${lat.toFixed(8)}, Lng: ${lng.toFixed(8)}`;
   },
