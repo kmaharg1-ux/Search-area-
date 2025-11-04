@@ -17,6 +17,7 @@ L.tileLayer.wms('https://gisservicemt.gov/arcgis/services/MSDI_Framework/PLSS/Ma
 // 📍 GPS Tracking with High Accuracy
 let currentLat = null;
 let currentLng = null;
+let gpsMarker = null;
 
 map.locate({ setView: true, watch: true, maxZoom: 16, enableHighAccuracy: true });
 
@@ -24,13 +25,22 @@ map.on('locationfound', function (e) {
   currentLat = e.latlng.lat;
   currentLng = e.latlng.lng;
 
-  const radius = e.accuracy;
-  L.marker(e.latlng).addTo(map)
-    .bindPopup(`You are within ${Math.round(radius)} meters`).openPopup();
-  L.circle(e.latlng, radius).addTo(map);
+  // Remove old marker if it exists
+  if (gpsMarker) {
+    map.removeLayer(gpsMarker);
+  }
 
+  // Add new blue dot marker
+  gpsMarker = L.circleMarker(e.latlng, {
+    radius: 8,
+    color: '#007bff',
+    fillColor: '#007bff',
+    fillOpacity: 1
+  }).addTo(map);
+
+  // Update GPS status text
   document.getElementById('gps-output').innerText =
-    `Lat: ${currentLat.toFixed(8)}, Lng: ${currentLng.toFixed(8)}, Accuracy: ±${Math.round(radius)} m`;
+    `Lat: ${currentLat.toFixed(8)}, Lng: ${currentLng.toFixed(8)}`;
 });
 
 map.on('locationerror', function () {
