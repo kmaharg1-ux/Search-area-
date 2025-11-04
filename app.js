@@ -104,19 +104,25 @@ document.getElementById('survey-form').addEventListener('submit', function (e) {
 
   // 📏 Chaining Error Zone
   let zoneBounds;
-  if (direction === 'north-south') {
-    zoneBounds = [
-      [currentLat - feetToDegreesLat(error), currentLng],
-      [currentLat + feetToDegreesLat(error), currentLng]
-    ];
-  } else {
-    zoneBounds = [
-      [currentLat, currentLng - feetToDegreesLng(error, currentLat)],
-      [currentLat, currentLng + feetToDegreesLng(error, currentLat)]
-    ];
-  }
+if (direction === 'north-south') {
+  zoneBounds = [
+    [currentLat - feetToDegreesLat(error), currentLng - 0.00005],
+    [currentLat + feetToDegreesLat(error), currentLng + 0.00005]
+  ];
+} else {
+  zoneBounds = [
+    [currentLat - 0.00005, currentLng - feetToDegreesLng(error, currentLat)],
+    [currentLat + 0.00005, currentLng + feetToDegreesLng(error, currentLat)]
+  ];
+}
 
-  L.polyline(zoneBounds, { color: 'orange', weight: 2, dashArray: '5,5' }).addTo(map);
+L.rectangle(zoneBounds, {
+  color: 'orange',
+  weight: 2,
+  dashArray: '5,5',
+  fillOpacity: 0.1
+}).addTo(map);
+
 
   // 🧠 Output Summary
   const output = `
