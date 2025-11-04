@@ -40,7 +40,7 @@ navigator.geolocation.watchPosition(
       }).addTo(map);
     }
 
-    map.setView(latlng, 16);
+   // map.setView(latlng, 16);
 
     document.getElementById('gps-output').innerText =
       `Lat: ${lat.toFixed(8)}, Lng: ${lng.toFixed(8)}`;
