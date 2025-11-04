@@ -12,17 +12,42 @@ header {
   text-align: center;
 }
 
-main {
+footer {
+  background: #2c3e50;
+  color: white;
+  text-align: center;
+  padding: 0.5em;
+}
+
+#main-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
   padding: 1em;
 }
 
-section {
-  margin-bottom: 2em;
+#map-container {
+  flex: 2;
 }
 
 #map {
   height: 600px;
+  width: 100%;
   border: 2px solid #ccc;
+}
+
+#controls-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+section {
+  background: white;
+  padding: 1em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 form label {
@@ -47,4 +72,10 @@ button {
 
 button:hover {
   background: #2980b9;
+}
+
+#gps-output {
+  background: #eef;
+  padding: 0.5em;
+  border: 1px solid #ccc;
 }
