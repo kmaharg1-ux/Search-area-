@@ -14,42 +14,48 @@
     <p>Montana topo + PLSS + declination offsets</p>
   </header>
 
-  <main>
-    <section id="map-section">
-      <h2>Live Map</h2>
+  <main id="main-layout">
+    <div id="map-container">
       <div id="map"></div>
-    </section>
+    </div>
 
-    <section id="input-section">
-      <h2>Survey Settings</h2>
-      <form id="survey-form">
-        <label for="distance">Distance (chains or feet):</label>
-        <input type="number" id="distance" name="distance" />
+    <div id="controls-container">
+      <section id="input-section">
+        <h2>Survey Settings</h2>
+        <form id="survey-form">
+          <label for="distance">Distance (chains or feet):</label>
+          <input type="number" id="distance" name="distance" />
 
-        <label for="declination">Magnetic Declination (°):</label>
-        <input type="number" id="declination" name="declination" step="0.1" />
+          <label for="declination">Magnetic Declination (°):</label>
+          <input type="number" id="declination" name="declination" step="0.1" />
 
-        <label for="direction">Travel Direction:</label>
-        <select id="direction" name="direction">
-          <option value="north-south">North–South</option>
-          <option value="east-west">East–West</option>
-        </select>
+          <label for="direction">Travel Direction:</label>
+          <select id="direction" name="direction">
+            <option value="north-south">North–South</option>
+            <option value="east-west">East–West</option>
+          </select>
 
-        <label for="chaining-error">Chaining Error Tolerance:</label>
-        <select id="chaining-error" name="chaining-error">
-          <option value="0">None</option>
-          <option value="66">±1 Chain (66 ft)</option>
-          <option value="132">±2 Chains (132 ft)</option>
-        </select>
+          <label for="chaining-error">Chaining Error Tolerance:</label>
+          <select id="chaining-error" name="chaining-error">
+            <option value="0">None</option>
+            <option value="66">±1 Chain (66 ft)</option>
+            <option value="132">±2 Chains (132 ft)</option>
+          </select>
 
-        <button type="submit">Calculate Offset</button>
-      </form>
-    </section>
+          <button type="submit">Calculate Offset</button>
+        </form>
+      </section>
 
-    <section id="results-section">
-      <h2>Offset Visualization</h2>
-      <div id="offset-output"></div>
-    </section>
+      <section id="gps-status">
+        <h2>GPS Status</h2>
+        <div id="gps-output">Waiting for location...</div>
+      </section>
+
+      <section id="results-section">
+        <h2>Offset Visualization</h2>
+        <div id="offset-output"></div>
+      </section>
+    </div>
   </main>
 
   <footer>
