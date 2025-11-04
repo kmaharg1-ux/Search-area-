@@ -14,11 +14,11 @@ L.tileLayer.wms('https://gisservicemt.gov/arcgis/services/MSDI_Framework/PLSS/Ma
   attribution: 'Montana State Library PLSS'
 }).addTo(map);
 
-// 📍 GPS Tracking
+// 📍 GPS Tracking with High Accuracy
 let currentLat = null;
 let currentLng = null;
 
-map.locate({ setView: true, watch: true, maxZoom: 16 });
+map.locate({ setView: true, watch: true, maxZoom: 16, enableHighAccuracy: true });
 
 map.on('locationfound', function (e) {
   currentLat = e.latlng.lat;
@@ -30,7 +30,7 @@ map.on('locationfound', function (e) {
   L.circle(e.latlng, radius).addTo(map);
 
   document.getElementById('gps-output').innerText =
-    `Lat: ${currentLat.toFixed(6)}, Lng: ${currentLng.toFixed(6)}, Accuracy: ±${Math.round(radius)} m`;
+    `Lat: ${currentLat.toFixed(8)}, Lng: ${currentLng.toFixed(8)}, Accuracy: ±${Math.round(radius)} m`;
 });
 
 map.on('locationerror', function () {
@@ -104,7 +104,7 @@ document.getElementById('survey-form').addEventListener('submit', function (e) {
   // 🧠 Output Summary
   const output = `
     <p><strong>Lateral Offset:</strong> ${lateralOffset.toFixed(2)} ft (${offsetDirection})</p>
-    <p><strong>Offset Location:</strong> Lat ${offsetLat.toFixed(6)}, Lng ${offsetLng.toFixed(6)}</p>
+    <p><strong>Offset Location:</strong> Lat ${offsetLat.toFixed(8)}, Lng ${offsetLng.toFixed(8)}</p>
     <p><strong>Chaining Error Zone:</strong> ±${error} ft (${direction})</p>
   `;
   document.getElementById('offset-output').innerHTML = output;
