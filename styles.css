@@ -92,6 +92,7 @@ button:hover {
   background: #eef;
   padding: 0.5em;
   border: 1px solid #ccc;
+  font-family: monospace;
 }
 
 /* Responsive layout for mobile */
@@ -111,4 +112,9 @@ button:hover {
   section {
     margin-bottom: 1em;
   }
+}
+
+/* Optional: enhance visibility of GPS blue dot */
+.leaflet-interactive {
+  stroke-width: 2;
 }
