@@ -2,66 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Surveying Assistant</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Montana Topo + PLSS + Declination Offsets</title>
+  <link rel="stylesheet" href="style.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha512-sA+e2Zt1p4+gq3n6Z7ZKXzj0Zz5q3zZ+z5zZz5zZz5zZz5zZz5zZz5zZz5zZz5zZz5zZz5zZz5zZz5zZz5zZz=="
+    crossorigin=""
+  />
 </head>
 <body>
-  <header>
-    <h1>Surveying Assistant</h1>
-    <p>Montana topo + PLSS + declination offsets</p>
-  </header>
+  <div id="map"></div>
 
-  <main id="main-layout">
-    <div id="map-container">
-      <div id="map"></div>
+  <div id="controls">
+    <div id="gps-output">Waiting for GPS...</div>
+
+    <form id="survey-form">
+      <label for="distance">Distance (chains or feet):</label>
+      <input type="number" id="distance" required />
+
+      <label for="declination">Magnetic Declination (°):</label>
+      <input type="number" id="declination" required />
+
+      <label for="direction">Direction of Travel:</label>
+      <select id="direction">
+        <option value="north-south">North–South</option>
+        <option value="east-west">East–West</option>
+      </select>
+
+      <label for="chaining-error">Chaining Error Tolerance (ft):</label>
+      <input type="number" id="chaining-error" value="66" required />
+
+      <button type="submit">Calculate</button>
+    </form>
+
+    <div id="results-section" style="display: none;">
+      <h3>Offset Results</h3>
+      <div id="offset-output"></div>
     </div>
+  </div>
 
-    <div id="controls-container">
-      <section id="input-section">
-        <h2>Survey Settings</h2>
-        <form id="survey-form">
-          <label for="distance">Distance (chains or feet):</label>
-          <input type="number" id="distance" name="distance" />
-
-          <label for="declination">Magnetic Declination (°):</label>
-          <input type="number" id="declination" name="declination" step="0.1" />
-
-          <label for="direction">Travel Direction:</label>
-          <select id="direction" name="direction">
-            <option value="north-south">North–South</option>
-            <option value="east-west">East–West</option>
-          </select>
-
-          <label for="chaining-error">Chaining Error Tolerance:</label>
-          <select id="chaining-error" name="chaining-error">
-            <option value="0">None</option>
-            <option value="66">±1 Chain (66 ft)</option>
-            <option value="132">±2 Chains (132 ft)</option>
-          </select>
-
-          <button type="submit">Calculate Offset</button>
-        </form>
-      </section>
-
-      <section id="gps-status">
-        <h2>GPS Status</h2>
-        <div id="gps-output">Waiting for location...</div>
-      </section>
-
-      <section id="results-section" style="display: none;">
-        <h2>Offset Visualization</h2>
-        <div id="offset-output"></div>
-      </section>
-    </div>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 Montana Surveying Tools</p>
-  </footer>
-
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
