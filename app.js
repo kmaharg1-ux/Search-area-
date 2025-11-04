@@ -46,6 +46,14 @@ document.getElementById('survey-form').addEventListener('submit', function (e) {
     return;
   }
 
+  // 🧼 Clear previous offset layers
+  map.eachLayer(layer => {
+    if (layer.options && (layer.options.title === "Declination Offset" || layer.options.color === "orange")) {
+      map.removeLayer(layer);
+    }
+  });
+
+  // 📥 Get form values
   const distance = parseFloat(document.getElementById('distance').value);
   const declination = parseFloat(document.getElementById('declination').value);
   const direction = document.getElementById('direction').value;
@@ -55,8 +63,8 @@ document.getElementById('survey-form').addEventListener('submit', function (e) {
   const offsetDirection = direction === 'north-south' ? 'east-west' : 'north-south';
 
   // 🧮 Convert feet to degrees (approximate)
-  const feetToDegreesLat = feet => feet / 364000; // ~364,000 ft per degree latitude
-  const feetToDegreesLng = (feet, lat) => feet / (Math.cos(lat * Math.PI / 180) * 288200); // ~288,200 ft per degree longitude at equator
+  const feetToDegreesLat = feet => feet / 364000;
+  const feetToDegreesLng = (feet, lat) => feet / (Math.cos(lat * Math.PI / 180) * 288200);
 
   let offsetLat = currentLat;
   let offsetLng = currentLng;
@@ -100,4 +108,5 @@ document.getElementById('survey-form').addEventListener('submit', function (e) {
     <p><strong>Chaining Error Zone:</strong> ±${error} ft (${direction})</p>
   `;
   document.getElementById('offset-output').innerHTML = output;
+  document.getElementById('results-section').style.display = 'block';
 });
