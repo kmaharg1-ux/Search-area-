@@ -33,14 +33,13 @@ navigator.geolocation.watchPosition(
       gpsMarker.setLatLng(latlng);
     } else {
       gpsMarker = L.circleMarker(latlng, {
-        radius: 8,
+        radius: 3, // 🔍 Smaller dot for better scale
         color: '#007bff',
         fillColor: '#007bff',
         fillOpacity: 1
       }).addTo(map);
     }
 
-    // ❌ No auto-zoom or auto-centering
     document.getElementById('gps-output').innerText =
       `Lat: ${lat.toFixed(8)}, Lng: ${lng.toFixed(8)}`;
   },
@@ -63,18 +62,23 @@ document.getElementById('survey-form').addEventListener('submit', function (e) {
     return;
   }
 
-  // 🧼 Clear previous offset layers
+  // 🧼 Clear previous offset visuals
   map.eachLayer(layer => {
-    if (layer.options && (layer.options.title === "Declination Offset" || layer.options.color === "orange")) {
+    if (layer.options && (layer.options.title === "Declination Offset" || layer.options.color === "orange" || layer.options.dashArray === '4,4')) {
       map.removeLayer(layer);
     }
   });
 
   // 📥 Get form values
-  const distance = parseFloat(document.getElementById('distance').value);
+  let distance = parseFloat(document.getElementById('distance').value);
   const declination = parseFloat(document.getElementById('declination').value);
   const direction = document.getElementById('direction').value;
   const error = parseInt(document.getElementById('chaining-error').value);
+
+  // 🧮 Convert chains to feet if needed
+  if (distance < 200) {
+    distance *= 66;
+  }
 
   const lateralOffset = Math.tan(declination * Math.PI / 180) * distance;
   const offsetDirection = direction === 'north-south' ? 'east-west' : 'north-south';
@@ -92,7 +96,7 @@ document.getElementById('survey-form').addEventListener('submit', function (e) {
     offsetLat += feetToDegreesLat(lateralOffset);
   }
 
-  // 📍 Offset Pin
+  // 📍 Declination Offset Pin
   L.marker([offsetLat, offsetLng], {
     title: "Declination Offset",
     icon: L.icon({
@@ -102,33 +106,48 @@ document.getElementById('survey-form').addEventListener('submit', function (e) {
     })
   }).addTo(map).bindPopup(`Offset: ${lateralOffset.toFixed(2)} ft ${offsetDirection}`).openPopup();
 
-  // 📏 Chaining Error Zone
+  // 📏 Chaining Error Zone around GPS location
   let zoneBounds;
-if (direction === 'north-south') {
-  zoneBounds = [
-    [currentLat - feetToDegreesLat(error), currentLng - 0.00005],
-    [currentLat + feetToDegreesLat(error), currentLng + 0.00005]
-  ];
-} else {
-  zoneBounds = [
-    [currentLat - 0.00005, currentLng - feetToDegreesLng(error, currentLat)],
-    [currentLat + 0.00005, currentLng + feetToDegreesLng(error, currentLat)]
-  ];
-}
+  if (direction === 'north-south') {
+    zoneBounds = [
+      [currentLat - feetToDegreesLat(error), currentLng - 0.00005],
+      [currentLat + feetToDegreesLat(error), currentLng + 0.00005]
+    ];
+  } else {
+    zoneBounds = [
+      [currentLat - 0.00005, currentLng - feetToDegreesLng(error, currentLat)],
+      [currentLat + 0.00005, currentLng + feetToDegreesLng(error, currentLat)]
+    ];
+  }
 
-L.rectangle(zoneBounds, {
-  color: 'orange',
-  weight: 2,
-  dashArray: '5,5',
-  fillOpacity: 0.1
-}).addTo(map);
+  L.rectangle(zoneBounds, {
+    color: 'orange',
+    weight: 2,
+    dashArray: '5,5',
+    fillOpacity: 0.1
+  }).addTo(map);
 
+  // 🔄 Line from GPS to Offset
+  L.polyline([
+    [currentLat, currentLng],
+    [offsetLat, offsetLng]
+  ], {
+    color: 'blue',
+    weight: 1,
+    dashArray: '4,4'
+  }).addTo(map);
+
+  // 📐 Distance to Offset
+  const dx = (offsetLng - currentLng) * 288200 * Math.cos(currentLat * Math.PI / 180);
+  const dy = (offsetLat - currentLat) * 364000;
+  const walkDistance = Math.sqrt(dx * dx + dy * dy);
 
   // 🧠 Output Summary
   const output = `
-    <p><strong>Lateral Offset:</strong> ${lateralOffset.toFixed(2)} ft (${offsetDirection})</p>
+    <p><strong>Declination Offset:</strong> ${lateralOffset.toFixed(2)} ft (${offsetDirection})</p>
     <p><strong>Offset Location:</strong> Lat ${offsetLat.toFixed(8)}, Lng ${offsetLng.toFixed(8)}</p>
-    <p><strong>Chaining Error Zone:</strong> ±${error} ft (${direction})</p>
+    <p><strong>Chaining Error Zone:</strong> ±${error} ft around GPS location (${direction})</p>
+    <p><strong>Distance to Offset:</strong> ${walkDistance.toFixed(1)} ft</p>
   `;
   document.getElementById('offset-output').innerHTML = output;
   document.getElementById('results-section').style.display = 'block';
