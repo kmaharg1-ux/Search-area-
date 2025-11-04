@@ -19,33 +19,41 @@ let currentLat = null;
 let currentLng = null;
 let gpsMarker = null;
 
-map.locate({ setView: true, watch: true, maxZoom: 16, enableHighAccuracy: true });
+navigator.geolocation.watchPosition(
+  function (position) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
 
-map.on('locationfound', function (e) {
-  currentLat = e.latlng.lat;
-  currentLng = e.latlng.lng;
+    currentLat = lat;
+    currentLng = lng;
 
-  // Remove old marker if it exists
-  if (gpsMarker) {
-    map.removeLayer(gpsMarker);
+    const latlng = L.latLng(lat, lng);
+
+    if (gpsMarker) {
+      gpsMarker.setLatLng(latlng);
+    } else {
+      gpsMarker = L.circleMarker(latlng, {
+        radius: 8,
+        color: '#007bff',
+        fillColor: '#007bff',
+        fillOpacity: 1
+      }).addTo(map);
+    }
+
+    map.setView(latlng, 16);
+
+    document.getElementById('gps-output').innerText =
+      `Lat: ${lat.toFixed(8)}, Lng: ${lng.toFixed(8)}`;
+  },
+  function () {
+    document.getElementById('gps-output').innerText = "Location access denied or unavailable.";
+  },
+  {
+    enableHighAccuracy: true,
+    maximumAge: 1000,
+    timeout: 10000
   }
-
-  // Add new blue dot marker
-  gpsMarker = L.circleMarker(e.latlng, {
-    radius: 8,
-    color: '#007bff',
-    fillColor: '#007bff',
-    fillOpacity: 1
-  }).addTo(map);
-
-  // Update GPS status text
-  document.getElementById('gps-output').innerText =
-    `Lat: ${currentLat.toFixed(8)}, Lng: ${currentLng.toFixed(8)}`;
-});
-
-map.on('locationerror', function () {
-  document.getElementById('gps-output').innerText = "Location access denied or unavailable.";
-});
+);
 
 // 📐 Declination Offset + Chaining Error
 document.getElementById('survey-form').addEventListener('submit', function (e) {
