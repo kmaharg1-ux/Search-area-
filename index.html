@@ -8,7 +8,6 @@
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha512-sA+e2Zt1p4+gq3n6Z7ZKXzj0Zz5q3zZ+z5zZz5zZz5zZz5zZz5zZz5zZz5zZz5zZz5zZz5zZz5zZz5zZz=="
     crossorigin=""
   />
 </head>
@@ -19,6 +18,8 @@
     <div id="map-container">
       <div id="map"></div>
     </div>
+
+    <button onclick="map.setView([46.6, -112.0], 13)">🔄 Reset View</button>
 
     <div id="controls">
       <div id="gps-output">Waiting for GPS...</div>
