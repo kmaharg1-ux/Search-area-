@@ -1,52 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Montana Surveying Assistant</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <title>Montana Survey Map</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 100vh; }
+    .layer-toggle {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: white;
+      padding: 8px;
+      z-index: 1000;
+      font-family: sans-serif;
+      border-radius: 4px;
+    }
+    .layer-toggle label {
+      display: block;
+      margin-bottom: 4px;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Montana Surveying Assistant</h1>
-
-    <div id="map-container">
-      <div id="map"></div>
-    </div>
-
-    <button onclick="map.setView([46.6, -112.0], 13)">🔄 Reset View</button>
-
-    <div id="controls">
-      <div id="gps-output">Waiting for GPS...</div>
-
-      <form id="survey-form">
-        <label for="distance">Distance (chains or feet):</label>
-        <input type="number" id="distance" required />
-
-        <label for="declination">Magnetic Declination (°):</label>
-        <input type="number" id="declination" required />
-
-        <label for="direction">Direction of Travel:</label>
-        <select id="direction">
-          <option value="north-south">North–South</option>
-          <option value="east-west">East–West</option>
-        </select>
-
-        <label for="chaining-error">Chaining Error Tolerance (ft):</label>
-        <input type="number" id="chaining-error" value="66" required />
-
-        <button type="submit">Calculate</button>
-      </form>
-
-      <div id="results-section" style="display: none;">
-        <h3>Offset Results</h3>
-        <div id="offset-output"></div>
-      </div>
-    </div>
+  <div id="map"></div>
+  <div class="layer-toggle">
+    <label><input type="checkbox" id="toggle-township" checked> Township</label>
+    <label><input type="checkbox" id="toggle-section" checked> Section</label>
+    <label><input type="checkbox" id="toggle-mineral" checked> Mineral</label>
+    <label><input type="checkbox" id="toggle-special" checked> Special</label>
+    <label><input type="checkbox" id="toggle-lode" checked> Lode</label>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="app.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([46.6, -112], 9); // Centered on Montana
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const geojsonUrl = 'https://drive.google.com/uc?export=download&id=1xUGhukqNxvBgQ_fXeeyxL734h_kO4J_b';
+
+    const layers = {
+      Township: L.layerGroup().addTo(map),
+      Section: L.layerGroup().addTo(map),
+      Mineral: L.layerGroup().addTo(map),
+      Special: L.layerGroup().addTo(map),
+      Lode: L.layerGroup().addTo(map)
+    };
+
+    fetch(geojsonUrl)
+      .then(res => res.json())
+      .then(data => {
+        L.geoJSON(data, {
+          onEachFeature: function (feature, layer) {
+            const props = feature.properties;
+            const type = props.source;
+
+            if (type === 'Township' && props.township) {
+              layer.bindPopup(`Township: ${props.township}`);
+            } else if (type === 'Section' && props['first division type text'] === 'section') {
+              layer.bindPopup(`Section ${props['first division number']}`);
+            }
+
+            layers[type]?.addLayer(layer);
+          },
+          style: function (feature) {
+            const type = feature.properties.source;
+            if (type === 'Township') return { color: '#1f77b4', weight: 1 };
+            if (type === 'Section') return { color: '#2ca02c', weight: 0.5 };
+            if (type === 'Mineral') return { color: '#ff7f0e', weight: 0.5, opacity: 0.6 };
+            if (type === 'Special') return { color: '#9467bd', weight: 0.5, dashArray: '4,2' };
+            if (type === 'Lode') return { color: '#d62728', weight: 0.5, dashArray: '1,3' };
+            return { color: '#999', weight: 0.5 };
+          }
+        });
+      });
+
+    map.on('zoomend', () => {
+      const zoom = map.getZoom();
+      Object.entries(layers).forEach(([type, group]) => {
+        let visible = true;
+        if (type === 'Section' && zoom < 12) visible = false;
+        if ((type === 'Mineral' || type === 'Special') && zoom < 13) visible = false;
+        if (type === 'Lode' && zoom < 14) visible = false;
+
+        group.eachLayer(layer => {
+          const checkbox = document.getElementById(`toggle-${type.toLowerCase()}`);
+          const show = visible && checkbox.checked;
+          layer.setStyle({ opacity: show ? 1 : 0, fillOpacity: show ? 0.2 : 0 });
+        });
+      });
+    });
+
+    ['township', 'section', 'mineral', 'special', 'lode'].forEach(type => {
+      document.getElementById(`toggle-${type}`).addEventListener('change', () => {
+        map.fire('zoomend'); // Reapply visibility logic
+      });
+    });
+  </script>
 </body>
 </html>
