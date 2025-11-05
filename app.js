@@ -6,12 +6,12 @@ L.tileLayer('https://basemap.nationalmap.gov/ArcGIS/rest/services/USGSTopo/MapSe
   attribution: 'Map data © USGS'
 }).addTo(map);
 
-// 🧭 Montana PLSS WMS Layer
-L.tileLayer.wms('https://gisservicemt.gov/arcgis/services/MSDI_Framework/PLSS/MapServer/WMSServer', {
-  layers: '0',
+// 🧭 BLM PLSS Section Lines
+L.tileLayer.wms('https://gis.blm.gov/arcgis/services/Cadastral/BLM_Natl_PLSS_CadNSDI/MapServer/WMSServer', {
+  layers: '2', // Layer 2 = PLSS Sections
   format: 'image/png',
   transparent: true,
-  attribution: 'Montana State Library PLSS'
+  attribution: 'BLM National PLSS'
 }).addTo(map);
 
 // 📍 GPS Tracking — No Auto-Zoom
