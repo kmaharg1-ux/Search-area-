@@ -1,5 +1,4 @@
-const map = L.map('map').setView([46.6, -112.0], 13);
-
+const map = L.map('map').setView([46.6, -112.0], 13); // ✅ Zoom level fixed
 
 // 🗺️ USGS Topo Tiles
 L.tileLayer('https://basemap.nationalmap.gov/ArcGIS/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
@@ -15,7 +14,7 @@ L.tileLayer.wms('https://gisservicemt.gov/arcgis/services/MSDI_Framework/PLSS/Ma
   attribution: 'Montana State Library PLSS'
 }).addTo(map);
 
-// 📍 GPS Tracking with High Accuracy — No Auto-Zoom
+// 📍 GPS Tracking — No Auto-Zoom
 let currentLat = null;
 let currentLng = null;
 let gpsMarker = null;
@@ -34,7 +33,7 @@ navigator.geolocation.watchPosition(
       gpsMarker.setLatLng(latlng);
     } else {
       gpsMarker = L.circleMarker(latlng, {
-        radius: 3, // 🔍 Smaller dot for better scale
+        radius: 1,
         color: '#007bff',
         fillColor: '#007bff',
         fillOpacity: 1
