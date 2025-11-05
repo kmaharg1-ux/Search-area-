@@ -88,3 +88,31 @@ button:hover {
 #offset-output p {
   margin: 4px 0;
 }
+
+/* 📱 Mobile Optimization */
+@media screen and (max-width: 600px) {
+  .container {
+    padding: 8px;
+  }
+
+  #map-container {
+    height: 400px;
+  }
+
+  #controls {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  #survey-form input,
+  #survey-form select,
+  #survey-form button {
+    font-size: 13px;
+    padding: 6px;
+  }
+
+  button {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+}
