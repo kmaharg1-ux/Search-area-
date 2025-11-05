@@ -1,4 +1,5 @@
-const map = L.map('map').setView([46.6, -112.0], 16);
+const map = L.map('map').setView([46.6, -112.0], 13);
+
 
 // 🗺️ USGS Topo Tiles
 L.tileLayer('https://basemap.nationalmap.gov/ArcGIS/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
